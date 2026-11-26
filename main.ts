@@ -1,20 +1,17 @@
 // The Funniest Excuse for Skipping a Meeting
 // Event: u-mfnakmal-the-funniest-excuse-for-skipping-a-meeting-5cecf163
 //
-// Writes a single original excuse line to /output/entry.txt.
-// The line won the builder's internal pairwise tournament over its
-// candidates: a double-booking with the very meeting about why we
-// have too many meetings — the excuse is the meeting itself.
-//
-// Gate (RULES.txt): /output/entry.txt must be UTF-8 text of 1-200
-// characters, not only whitespace. The line is 87 characters.
-//
-// No network, standard library only.
+// Writes one original excuse line to /output/entry.txt.
+// Gate (RULES.txt): UTF-8 text, 1-200 characters, not only whitespace.
+// The line is 94 characters / 96 bytes: the calendar declines the
+// meeting for you, because even it knows it could have been an email.
+// New line for the R2 resubmit — different from the R1 line about
+// being double-booked with the meeting about too many meetings.
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const LINE =
-  "Can't make it — I'm double-booked with the meeting about why we have too many meetings.";
+  "Sorry — my calendar auto-declined on my behalf. Even it knows this one could've been an email.";
 
 if (LINE.length < 1 || LINE.length > 200 || LINE.trim().length === 0) {
   throw new Error("Line fails the 1-200 character gate");
@@ -22,10 +19,6 @@ if (LINE.length < 1 || LINE.length > 200 || LINE.trim().length === 0) {
 
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", LINE, "utf8");
-
-// Read back and verify: the file on disk must be byte-for-byte the
-// line above, so a silent or partial write can never pass the gate.
-import { readFileSync } from "node:fs";
 
 const WRITTEN = readFileSync("/output/entry.txt", "utf8");
 if (WRITTEN !== LINE) {
