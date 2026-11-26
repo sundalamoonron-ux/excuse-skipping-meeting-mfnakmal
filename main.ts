@@ -10,17 +10,33 @@
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
+// Two-beat structure: SETUP (the calendar declines for you) then
+// PUNCHLINE (even the calendar knows it could have been an email).
+// The setup carries the relatable office truth; the punchline lands
+// the laugh by giving the calendar a knowing opinion of its own.
 const LINE =
   "Sorry — my calendar auto-declined on my behalf. Even it knows this one could've been an email.";
 
-if (LINE.length < 1 || LINE.length > 200 || LINE.trim().length === 0) {
-  throw new Error("Line fails the 1-200 character gate");
+// Gate (RULES.txt): UTF-8 text, 1-200 characters, not only whitespace.
+const MIN_CHARS = 1;
+const MAX_CHARS = 200;
+
+function writeEntry(line: string, path: string): void {
+  if (
+    line.length < MIN_CHARS ||
+    line.length > MAX_CHARS ||
+    line.trim().length === 0
+  ) {
+    throw new Error("Line fails the 1-200 character gate");
+  }
+
+  mkdirSync("/output", { recursive: true });
+  writeFileSync(path, line, "utf8");
+
+  const WRITTEN = readFileSync(path, "utf8");
+  if (WRITTEN !== line) {
+    throw new Error("Verification failed: /output/entry.txt does not match the line");
+  }
 }
 
-mkdirSync("/output", { recursive: true });
-writeFileSync("/output/entry.txt", LINE, "utf8");
-
-const WRITTEN = readFileSync("/output/entry.txt", "utf8");
-if (WRITTEN !== LINE) {
-  throw new Error("Verification failed: /output/entry.txt does not match the line");
-}
+writeEntry(LINE, "/output/entry.txt");
